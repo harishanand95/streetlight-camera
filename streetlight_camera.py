@@ -32,6 +32,7 @@ async def download_url(url, output, apikey):
                     if not chunk:
                         break
                     print(chunk)
+                    chunk = chunk[0] # only for linux systems
                     with open("files/{0}".format(output), 'wb') as f:
                         f.write(chunk)
                     with open("files/{0}".format(output), 'r') as f:
@@ -164,4 +165,4 @@ if __name__ == '__main__':
     streetlight_state = "OFF"
     turnoff_wait = 0
     subscribe('8bf443fcfc18470f81b28216142d413c', 'test100')
-    # publish_to_steetlight(0)
+    publish_to_steetlight(0)
