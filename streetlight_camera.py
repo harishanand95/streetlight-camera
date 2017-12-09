@@ -9,7 +9,7 @@ global streetlight_state
 from contextlib import suppress
 import asyncio
 from time import sleep
-
+from amqptest import switch
 
 async def download_url(url, output, apikey):
     """
@@ -23,7 +23,7 @@ async def download_url(url, output, apikey):
     headers = {'apikey': apikey}
     try:
         async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as session:
-            async with session.get(url, headers=headers, timeout=300) as response:
+            async with session.get(url, headers=headers, timeout=600) as response:
                 while True:  # loop over for each chunk of data
                     chunk = await response.content.readchunk()
                     if skip_initial_data is True:
@@ -75,7 +75,7 @@ def subscribe(api_key, resource_id):
     try:
         loop = asyncio.get_event_loop()
         i = 0
-        while i < 100:
+        while i < 9999:
             print("Trying to subscribe :: "+str(i))
             # loop.run_until_complete(download_url("https://10.156.14.144/api/0.1.0/subscribe?name={0}".format(resource_id), "demo_{0}.txt".format(api_key), api_key))
             loop.run_until_complete(
@@ -107,6 +107,7 @@ def analytics(json):
             print("{} STREETLIGHT TURNED ON".format(datetime.now()))
             streetlight_state = "ON"
             publish_to_steetlight(100)
+            switch("10", "1")
         print("{} TURNOFFCOUNT:".format(datetime.now()) + str(turnoff_wait))
     else:
         if turnoff_wait >= 0:
@@ -118,6 +119,7 @@ def analytics(json):
                 print("{} STREETLIGHT TURNED OFF".format(datetime.now()))
                 streetlight_state = "OFF"
                 publish_to_steetlight(0)
+                switch("10", "0")
 
 def publish(api_key, resource_id, data):
     """ Publishes the streetlight data to the middleware.
